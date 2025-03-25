@@ -29,6 +29,8 @@ enum class Control {
 
   JUMP,
   ACTION,
+  GRAB,
+  INTERACT,
   ITEM,
 
   START,

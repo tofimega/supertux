@@ -58,6 +58,9 @@ private:
   std::map<SDL_Keycode, PlayerControl> m_keymap;
   std::set<Control> m_configurable_controls;
   bool m_jump_with_up_kbd;
+  bool m_interact_with_up_kbd;
+  bool m_grab_with_action_kbd;
+
 
 private:
   KeyboardConfig(const KeyboardConfig&) = delete;

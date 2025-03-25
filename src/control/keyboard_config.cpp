@@ -34,6 +34,8 @@ KeyboardConfig::KeyboardConfig() :
     Control::RIGHT,
     Control::JUMP,
     Control::ACTION,
+    Control::GRAB,
+    Control::INTERACT,
     Control::ITEM,
     Control::PEEK_LEFT,
     Control::PEEK_RIGHT,
@@ -51,6 +53,9 @@ KeyboardConfig::KeyboardConfig() :
   m_keymap[SDLK_UP]        = {0, Control::UP};
   m_keymap[SDLK_DOWN]      = {0, Control::DOWN};
   m_keymap[SDLK_SPACE]     = {0, Control::JUMP};
+  m_keymap[SDLK_LCTRL]     = {0, Control::ACTION};
+  m_keymap[SDLK_z]         = {0, Control::GRAB};
+  m_keymap[SDLK_x]         = {0, Control::INTERACT};
   m_keymap[SDLK_LCTRL]     = {0, Control::ACTION};
   m_keymap[SDLK_LSHIFT]    = {0, Control::ITEM};
   m_keymap[SDLK_ESCAPE]    = {0, Control::ESCAPE};

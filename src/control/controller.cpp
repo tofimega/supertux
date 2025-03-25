@@ -27,6 +27,8 @@ const char* g_control_names[] = {
   "down",
   "jump",
   "action",
+  "grab",
+  "interact",
   "item",
   "start",
   "escape",

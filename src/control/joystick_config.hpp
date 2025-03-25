@@ -55,6 +55,9 @@ public:
 private:
   int m_dead_zone;
   bool m_jump_with_up_joy;
+  bool m_interact_with_up_joy;
+  bool m_grab_with_action_joy;
+
   bool m_use_game_controller;
 
   std::map<std::pair<JoystickID, int>, Control> m_joy_button_map;

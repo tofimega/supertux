@@ -39,6 +39,8 @@ KeyboardMenu::KeyboardMenu(InputManager& input_manager, int player_id) :
   add_controlfield(static_cast<int>(Control::RIGHT),      _("Right"));
   add_controlfield(static_cast<int>(Control::JUMP),       _("Jump"));
   add_controlfield(static_cast<int>(Control::ACTION),     _("Action"));
+  add_controlfield(static_cast<int>(Control::GRAB),       _("Grab"));
+  add_controlfield(static_cast<int>(Control::INTERACT),   _("Interact"));
   add_controlfield(static_cast<int>(Control::ITEM),       _("Item Pocket"));
 
   add_controlfield(static_cast<int>(Control::PEEK_LEFT),  _("Peek Left"));
@@ -54,20 +56,26 @@ KeyboardMenu::KeyboardMenu(InputManager& input_manager, int player_id) :
       add_controlfield(static_cast<int>(Control::DEBUG_MENU), _("Debug Menu"));
     }
   }
-  add_toggle(static_cast<int>(Control::CONTROLCOUNT), _("Jump with Up"), &g_config->keyboard_config.m_jump_with_up_kbd);
   add_hl();
+  add_toggle(static_cast<int>(Control::CONTROLCOUNT), _("Jump with Up"), &g_config->keyboard_config.m_jump_with_up_kbd);
+  add_toggle(static_cast<int>(Control::CONTROLCOUNT)+1, _("Interact with Up"), &g_config->keyboard_config.m_interact_with_up_kbd);
+  add_toggle(static_cast<int>(Control::CONTROLCOUNT)+2, _("Grab with Action"), &g_config->keyboard_config.m_grab_with_action_kbd);
+  
 
-  if (m_player_id == 0)
+  if (m_input_manager.get_num_users()>1)
   {
-    for (int id = 1; id < m_input_manager.get_num_users(); id++)
+    add_hl();
+    for (int id = 0; id < m_input_manager.get_num_users(); id++)
     {
+      if(id==m_player_id) continue;
       add_entry(fmt::format(fmt::runtime(_("Player {}")), std::to_string(id + 1)),
       [&input_manager, id] {
-        MenuManager::instance().push_menu(std::make_unique<KeyboardMenu>(input_manager, id));
+        MenuManager::instance().set_menu(std::make_unique<KeyboardMenu>(input_manager, id));
       });
     }
     add_hl();
   }
+else add_hl();
 
   add_back(_("Back"));
   refresh();
@@ -127,7 +135,7 @@ void
 KeyboardMenu::refresh()
 {
   const auto& controls = { Control::UP, Control::DOWN, Control::LEFT, Control::RIGHT,
-                           Control::JUMP, Control::ACTION, Control::ITEM,
+                           Control::JUMP, Control::ACTION, Control::GRAB, Control::INTERACT, Control::ITEM,
                            Control::PEEK_LEFT, Control::PEEK_RIGHT,
                            Control::PEEK_UP, Control::PEEK_DOWN };
 

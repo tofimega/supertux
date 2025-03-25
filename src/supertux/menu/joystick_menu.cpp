@@ -74,6 +74,8 @@ JoystickMenu::recreate_menu()
       add_controlfield(static_cast<int>(Control::RIGHT),       _("Right"));
       add_controlfield(static_cast<int>(Control::JUMP),        _("Jump"));
       add_controlfield(static_cast<int>(Control::ACTION),      _("Action"));
+      add_controlfield(static_cast<int>(Control::GRAB),        _("Grab"));
+      add_controlfield(static_cast<int>(Control::INTERACT),    _("Interact")); 
       add_controlfield(static_cast<int>(Control::ITEM),        _("Item Pocket"));
       add_controlfield(static_cast<int>(Control::START),       _("Pause/Menu"));
       add_controlfield(static_cast<int>(Control::PEEK_LEFT),   _("Peek Left"));
@@ -86,6 +88,8 @@ JoystickMenu::recreate_menu()
         add_controlfield(static_cast<int>(Control::DEBUG_MENU), _("Debug Menu"));
       }
       add_toggle(MNID_JUMP_WITH_UP, _("Jump with Up"), &g_config->joystick_config.m_jump_with_up_joy);
+      add_toggle(MNID_JUMP_WITH_UP+1, _("Interact with Up"), &g_config->joystick_config.m_interact_with_up_joy);
+      add_toggle(MNID_JUMP_WITH_UP+1, _("Grab with Action"), &g_config->joystick_config.m_grab_with_action_joy);
     }
     else
     {
@@ -226,6 +230,8 @@ JoystickMenu::refresh()
 
     refresh_menu_item(Control::JUMP);
     refresh_menu_item(Control::ACTION);
+    refresh_menu_item(Control::GRAB);
+    refresh_menu_item(Control::INTERACT);
     refresh_menu_item(Control::ITEM);
     refresh_menu_item(Control::START);
     refresh_menu_item(Control::PEEK_LEFT);
