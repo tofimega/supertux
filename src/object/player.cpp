@@ -1027,7 +1027,7 @@ Player::handle_input_swimming()
   float pointx = float(m_controller->hold(Control::RIGHT)) - float(m_controller->hold(Control::LEFT)),
         pointy = float(m_controller->hold(Control::DOWN)) - float(m_controller->hold(Control::UP));
 
-  bool boost = m_controller->hold(Control::JUMP);
+  bool boost = m_controller->hold(Control::BOOST);
 
   swim(pointx, pointy, boost);
 }

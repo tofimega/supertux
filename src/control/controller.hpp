@@ -49,7 +49,9 @@ enum class Control {
   PEEK_UP,
   PEEK_DOWN,
 
-  CONTROLCOUNT
+  CONTROLCOUNT,
+
+  BOOST // secret unmappable input used to decouple swim-boosting from JUMP, so that Tux doesn't boost while swimming up when jump with up is enabled
 };
 
 std::ostream& operator<<(std::ostream& os, Control control);
@@ -66,8 +68,14 @@ public:
   virtual void update();
 
   void set_control(Control control, bool value);
+  void set_control_key_flags(Control control, bool value);
 
-  void set_jump_key_with_up(bool value);
+
+  inline bool jump_key_pressed() {return m_jump_key_pressed;}
+  inline bool up_key_pressed() {return m_up_key_pressed;}
+
+  inline bool grab_key_pressed() {return m_grab_key_pressed;}
+  inline bool action_key_pressed() {return m_action_key_pressed;}
 
   /** Touchscreen flag is set by MobileController, cleared when starting the level */
   inline void set_touchscreen(bool value) { m_touchscreen = value; }
@@ -109,8 +117,12 @@ protected:
 
   /** the jump key is pressed for this controller */
   bool m_jump_key_pressed;
+  bool m_up_key_pressed;
 
-private:
+  bool m_grab_key_pressed;
+  bool m_action_key_pressed;
+
+  private:
   Controller(const Controller&) = delete;
   Controller& operator=(const Controller&) = delete;
 };
