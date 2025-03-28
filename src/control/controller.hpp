@@ -28,6 +28,7 @@ enum class Control {
   DOWN,
 
   JUMP,
+  BOOST, // secret unmappable input used to decouple swim-boosting from JUMP, so that Tux doesn't boost while swimming upward when jump with up is enabled
   ACTION,
   GRAB,
   INTERACT,
@@ -51,7 +52,7 @@ enum class Control {
 
   CONTROLCOUNT,
 
-  BOOST // secret unmappable input used to decouple swim-boosting from JUMP, so that Tux doesn't boost while swimming up when jump with up is enabled
+ 
 };
 
 std::ostream& operator<<(std::ostream& os, Control control);
