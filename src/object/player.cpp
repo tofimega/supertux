@@ -1666,7 +1666,7 @@ Player::handle_input()
   }
 
   /* Drop grabbed object when releasing the Action button on keyboard or gamepad, and on the second button press when using touchscreen */
-  if ((m_controller->is_touchscreen() ? m_controller->pressed(Control::ACTION) : !m_controller->hold(Control::ACTION)) &&
+  if ((m_controller->is_touchscreen() ? m_controller->pressed(Control::GRAB) : !m_controller->hold(Control::GRAB)) &&
       m_grabbed_object && !just_grabbed)
   {
     auto moving_object = dynamic_cast<MovingObject*>(m_grabbed_object);
@@ -1733,7 +1733,7 @@ Player::handle_input()
     }
   }
 
-  if (!m_controller->hold(Control::ACTION) && m_released_object) {
+  if (!m_controller->hold(Control::GRAB) && m_released_object) {
     m_released_object = false;
   }
 
@@ -1793,7 +1793,7 @@ Player::position_grabbed_object(bool teleport)
 bool
 Player::try_grab()
 {
-  if (m_controller->hold(Control::ACTION) && !m_grabbed_object && !(m_duck ^ m_crawl) && !m_released_object)
+  if (m_controller->hold(Control::GRAB) && !m_grabbed_object && !(m_duck ^ m_crawl) && !m_released_object)
   {
 
     Vector pos(0.0f, 0.0f);
@@ -2379,9 +2379,10 @@ Player::collision(MovingObject& other, const CollisionHit& hit)
   if (other.get_group() == COLGROUP_TOUCHABLE) {
     auto trigger = dynamic_cast<TriggerBase*> (&other);
     if (trigger && !m_deactivated) {
-      if (m_controller->pressed(Control::UP))
+      if (m_controller->pressed(Control::INTERACT) ||
+      (dynamic_cast<Climbable*>(trigger) && m_controller->pressed(Control::UP)))
         trigger->event(*this, TriggerBase::EVENT_ACTIVATE);
-    }
+      }
 
     return FORCE_MOVE;
   }
