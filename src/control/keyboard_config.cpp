@@ -45,7 +45,9 @@ KeyboardConfig::KeyboardConfig() :
     Control::CHEAT_MENU,
     Control::DEBUG_MENU
   }),
-  m_jump_with_up_kbd(false)
+  m_jump_with_up_kbd(false),
+  m_grab_with_action_kbd(false),
+  m_interact_with_up_kbd(false)
 {
   // initialize default keyboard map
   m_keymap[SDLK_LEFT]      = {0, Control::LEFT};
@@ -86,6 +88,9 @@ KeyboardConfig::read(const ReaderMapping& keymap_mapping)
     return;
 
   keymap_mapping.get("jump-with-up", m_jump_with_up_kbd);
+  keymap_mapping.get("grab-with-action", m_grab_with_action_kbd);
+  keymap_mapping.get("interact-with-up", m_interact_with_up_kbd);
+
 
   auto iter = keymap_mapping.get_iter();
   while (iter.next())
@@ -174,6 +179,8 @@ KeyboardConfig::write(Writer& writer)
   writer.write("sdl2", true);
 
   writer.write("jump-with-up", m_jump_with_up_kbd);
+  writer.write("grab-with-action", m_grab_with_action_kbd);
+  writer.write("interact-with-up", m_interact_with_up_kbd);
 
   for (const auto& i : m_keymap)
   {

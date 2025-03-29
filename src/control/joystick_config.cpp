@@ -26,6 +26,8 @@
 JoystickConfig::JoystickConfig() :
   m_dead_zone(8000),
   m_jump_with_up_joy(false),
+  m_grab_with_action_joy(false),
+  m_interact_with_up_joy(false),
   m_use_game_controller(true),
   m_joy_button_map(),
   m_joy_axis_map(),
@@ -164,6 +166,8 @@ JoystickConfig::read(const ReaderMapping& joystick_mapping)
 {
   joystick_mapping.get("dead-zone", m_dead_zone);
   joystick_mapping.get("jump-with-up", m_jump_with_up_joy);
+  joystick_mapping.get("grab-with-action", m_grab_with_action_joy);
+  joystick_mapping.get("interact-with-up", m_interact_with_up_joy);
   joystick_mapping.get("use-game-controller", m_use_game_controller);
 
   auto iter = joystick_mapping.get_iter();
@@ -220,6 +224,8 @@ JoystickConfig::write(Writer& writer)
 {
   writer.write("dead-zone", m_dead_zone);
   writer.write("jump-with-up", m_jump_with_up_joy);
+  writer.write("grab-with-action", m_grab_with_action_joy);
+  writer.write("interact-with-up", m_interact_with_up_joy);
   writer.write("use-game-controller", m_use_game_controller);
 
   for (const auto& i : m_joy_button_map) {
