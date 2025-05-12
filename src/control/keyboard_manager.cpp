@@ -21,6 +21,8 @@
 #include "control/input_manager.hpp"
 #include "gui/menu_manager.hpp"
 #include "supertux/console.hpp"
+#include "gui/dialog.hpp"
+#include <fmt/format.h>
 
 KeyboardManager::KeyboardManager(InputManager* parent,
                                  KeyboardConfig& keyboard_config) :
@@ -184,7 +186,19 @@ KeyboardManager::process_menu_key_event(const SDL_KeyboardEvent& event)
     if (event.keysym.sym != SDLK_ESCAPE &&
         event.keysym.sym != SDLK_PAUSE)
     {
+      if(m_keyboard_config.is_bound(event.keysym.sym)){
+        Dialog::show_confirmation(fmt::format(fmt::runtime(_("This input is already mapped to {} on Player {}. would you like to overwrite it?")),
+        Control_to_string(m_wait_for_key->control), std::to_string(m_wait_for_key->player + 1)), 
+        [event,this]{
+        m_keyboard_config.bind_key(event.keysym.sym, m_wait_for_key->player, m_wait_for_key->control);
+        MenuManager::instance().set_dialog({});
+        });
+      }
+      else{
       m_keyboard_config.bind_key(event.keysym.sym, m_wait_for_key->player, m_wait_for_key->control);
+       MenuManager::instance().set_dialog({});
+      }
+     
     }
     m_parent->reset();
     MenuManager::instance().refresh();

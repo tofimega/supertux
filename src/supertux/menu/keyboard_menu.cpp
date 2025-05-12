@@ -25,6 +25,7 @@
 #include "supertux/globals.hpp"
 #include "util/gettext.hpp"
 
+#include "supertux/menu/keybind_config_menu.hpp"
 #include <fmt/format.h>
 
 KeyboardMenu::KeyboardMenu(InputManager& input_manager, int player_id) :
@@ -32,6 +33,12 @@ KeyboardMenu::KeyboardMenu(InputManager& input_manager, int player_id) :
   m_player_id(player_id)
 {
   add_label(_("Setup Keyboard"));
+  add_hl();
+  add_entry((_("Test")),
+      [&input_manager, player_id] {
+        MenuManager::instance().push_menu(std::make_unique<KeybindConfigMenu>(input_manager, player_id, Control::UP));
+      });
+
   add_hl();
   add_controlfield(static_cast<int>(Control::UP),         _("Up"));
   add_controlfield(static_cast<int>(Control::DOWN),       _("Down"));
@@ -158,8 +165,10 @@ KeyboardMenu::refresh()
 void
 KeyboardMenu::refresh_control(const Control& control)
 {
+  
   ItemControlField& field = static_cast<ItemControlField&>(get_item_by_id(static_cast<int>(control)));
-  field.change_input(get_key_name(g_config->keyboard_config.reversemap_key(m_player_id, control)));
-}
+  field.change_input(get_key_name(g_config->keyboard_config.reversemap_key(m_player_id, control)[0]));
+
+  }
 
 /* EOF */

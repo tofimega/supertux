@@ -20,6 +20,7 @@
 #include <SDL.h>
 #include <map>
 #include <set>
+#include <vector>
 
 #include "control/controller.hpp"
 
@@ -48,9 +49,11 @@ public:
 public:
   KeyboardConfig();
 
-  SDL_Keycode reversemap_key(int player, Control c) const;
+  std::vector<SDL_Keycode> reversemap_key(int player, Control c) const;
   void bind_key(SDL_Keycode key, int player, Control c);
-
+  void erase_binding(SDL_Keycode key);
+  void clear_bindings(int player, Control c);
+  inline bool is_bound(SDL_Keycode key){return m_keymap.find(key)!=m_keymap.end();};
   void read(const ReaderMapping& keymap_mapping);
   void write(Writer& writer);
 

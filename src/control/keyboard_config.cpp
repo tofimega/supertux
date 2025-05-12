@@ -15,8 +15,9 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "control/keyboard_config.hpp"
-
+#include "gui/dialog.hpp"
 #include <optional>
+#include <vector>
 
 #include "util/log.hpp"
 #include "util/reader_mapping.hpp"
@@ -133,6 +134,23 @@ KeyboardConfig::read(const ReaderMapping& keymap_mapping)
 void
 KeyboardConfig::bind_key(SDL_Keycode key, int player, Control c)
 {
+  erase_binding(key);
+  // add new mapping
+  m_keymap[key] = PlayerControl{player, c};
+}
+
+void
+KeyboardConfig::erase_binding(SDL_Keycode key){
+  auto i = m_keymap.find(key);
+  if (i != m_keymap.end())
+   m_keymap.erase(i);
+}
+
+
+
+void
+KeyboardConfig::clear_bindings(int player, Control c)
+{
   // remove all previous mappings for that control and for that key
   for (auto i = m_keymap.begin(); i != m_keymap.end(); /* no ++i */)
   {
@@ -147,27 +165,22 @@ KeyboardConfig::bind_key(SDL_Keycode key, int player, Control c)
       ++i;
     }
   }
-
-  auto i = m_keymap.find(key);
-  if (i != m_keymap.end())
-    m_keymap.erase(i);
-
-  // add new mapping
-  m_keymap[key] = PlayerControl{player, c};
 }
 
-SDL_Keycode
+
+std::vector<SDL_Keycode>
 KeyboardConfig::reversemap_key(int player, Control c) const
 {
+  std::vector<SDL_Keycode> rt;
   for (const auto& i : m_keymap)
   {
     if (i.second == PlayerControl{player, c})
     {
-      return i.first;
+      rt.push_back(i.first);
     }
   }
 
-  return SDLK_UNKNOWN;
+  return rt;
 }
 
 void
