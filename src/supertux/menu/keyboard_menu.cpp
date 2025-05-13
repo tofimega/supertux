@@ -65,6 +65,15 @@ KeyboardMenu::KeyboardMenu(InputManager& input_manager, int player_id) :
   add_toggle(static_cast<int>(Control::CONTROLCOUNT)+1, _("Interact with Up"), &g_config->keyboard_config.m_interact_with_up_kbd);
   add_toggle(static_cast<int>(Control::CONTROLCOUNT)+2, _("Grab with Action"), &g_config->keyboard_config.m_grab_with_action_kbd);
   
+  add_hl();
+  add_entry(_("Reset bindings"), [p=m_player_id]{
+
+  Dialog::show_confirmation(_("Reset bindings for this player?"),
+  [p] {
+    g_config->keyboard_config.reset_bindings(p);
+  }
+);
+});
 
   if (m_input_manager.get_num_users()>1)
   {
@@ -132,39 +141,6 @@ KeyboardMenu::menu_action(MenuItem& item)
     MenuManager::instance().push_menu(std::make_unique<KeybindConfigMenu>(m_input_manager, m_player_id, static_cast<Control>(item.get_id())));
   }
 }
-/*
-void
-KeyboardMenu::refresh()
-{
-  const auto& controls = { Control::UP, Control::DOWN, Control::LEFT, Control::RIGHT,
-                           Control::JUMP, Control::ACTION, Control::GRAB, Control::INTERACT, Control::ITEM,
-                           Control::PEEK_LEFT, Control::PEEK_RIGHT,
-                           Control::PEEK_UP, Control::PEEK_DOWN };
 
-  const auto& developer_controls = { Control::CHEAT_MENU, Control::DEBUG_MENU, Control::CONSOLE };
-
-  for(const auto& control : controls)
-  {
-    refresh_control(control);
-  }
-
-  if (g_config->developer_mode && m_player_id == 0)
-  {
-    for(const auto& control: developer_controls)
-    {
-      refresh_control(control);
-    }
-  }
-}
-
-void
-KeyboardMenu::refresh_control(const Control& control)
-{
-  return;
-  ItemControlField& field = static_cast<ItemControlField&>(get_item_by_id(static_cast<int>(control)));
-  field.change_input(get_key_name(g_config->keyboard_config.reversemap_key(m_player_id, control)[0]));
-
-  }
-*/
 
 /* EOF */

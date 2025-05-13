@@ -41,11 +41,18 @@ void KeybindConfigMenu::refresh(){
 
     add_hl();
     add_entry(_("Add new binding"),
-      [this] {
+      [p=m_player_id, c=m_configured_action, &i=m_input_manager] {
         Dialog::show_message("Press any key");
-       m_input_manager.keyboard_manager->bind_next_event_to(m_player_id, static_cast<Control>(m_configured_action));
+       i.keyboard_manager->bind_next_event_to(p, static_cast<Control>(c));
       });
-
+add_entry(_("Clear bindings"),
+      [p=m_player_id, c=m_configured_action] {
+        Dialog::show_confirmation(_("Clear bindings for this action?"), [p,c]{
+        g_config->keyboard_config.clear_bindings(p,c);
+        MenuManager::instance().refresh();
+        });
+       
+      });
     add_hl();
     add_back(_("Back"));
 

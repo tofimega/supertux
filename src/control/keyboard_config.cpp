@@ -51,6 +51,21 @@ KeyboardConfig::KeyboardConfig() :
   m_interact_with_up_kbd(false)
 {
   // initialize default keyboard map
+  reset_bindings(0);
+}
+
+void
+KeyboardConfig::reset_bindings(int player_id){
+
+  for (int i= 0; i< static_cast<int>(Control::CONTROLCOUNT); ++i){
+    Control c=static_cast<Control>(i);
+    if (is_configurable(c)){
+      clear_bindings(player_id, c);
+    }
+
+  }
+
+  if (player_id !=0) return;
   m_keymap[SDLK_LEFT]      = {0, Control::LEFT};
   m_keymap[SDLK_RIGHT]     = {0, Control::RIGHT};
   m_keymap[SDLK_UP]        = {0, Control::UP};
@@ -74,7 +89,10 @@ KeyboardConfig::KeyboardConfig() :
   m_keymap[SDLK_F1]        = {0, Control::CHEAT_MENU};
   m_keymap[SDLK_F2]        = {0, Control::DEBUG_MENU};
   m_keymap[SDLK_BACKSPACE] = {0, Control::REMOVE};
+
+
 }
+
 
 void
 KeyboardConfig::read(const ReaderMapping& keymap_mapping)
@@ -157,7 +175,7 @@ KeyboardConfig::is_configurable(SDL_Keycode key)
 void
 KeyboardConfig::erase_binding(SDL_Keycode key){
   auto i = m_keymap.find(key);
-  if (i != m_keymap.end())
+  if (i != m_keymap.end() && is_configurable(i->second.control))
    m_keymap.erase(i);
 }
 
@@ -173,6 +191,7 @@ KeyboardConfig::get_binding(SDL_Keycode key)
 void
 KeyboardConfig::clear_bindings(int player, Control c)
 {
+  if(!is_configurable(c)) return;
   // remove all previous mappings for that control and for that key
   for (auto i = m_keymap.begin(); i != m_keymap.end(); /* no ++i */)
   {
