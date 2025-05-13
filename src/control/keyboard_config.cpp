@@ -146,7 +146,14 @@ KeyboardConfig::erase_binding(SDL_Keycode key){
    m_keymap.erase(i);
 }
 
-
+std::optional<KeyboardConfig::PlayerControl>
+KeyboardConfig::get_binding(SDL_Keycode key)
+{
+  auto i = m_keymap.find(key);
+  if (i!=m_keymap.end())
+    return static_cast<KeyboardConfig::PlayerControl>(i->second);
+  return std::nullopt;
+}
 
 void
 KeyboardConfig::clear_bindings(int player, Control c)

@@ -21,6 +21,7 @@
 #include <map>
 #include <set>
 #include <vector>
+#include <optional>
 
 #include "control/controller.hpp"
 
@@ -54,6 +55,7 @@ public:
   void erase_binding(SDL_Keycode key);
   void clear_bindings(int player, Control c);
   inline bool is_bound(SDL_Keycode key){return m_keymap.find(key)!=m_keymap.end();};
+  std::optional<PlayerControl> get_binding(SDL_Keycode key);
   void read(const ReaderMapping& keymap_mapping);
   void write(Writer& writer);
 
