@@ -180,6 +180,7 @@ KeyboardConfig::reversemap_key(int player, Control c) const
     }
   }
 
+  if (rt.size()==0) rt.push_back(SDLK_UNKNOWN);
   return rt;
 }
 
