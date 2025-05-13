@@ -134,10 +134,25 @@ KeyboardConfig::read(const ReaderMapping& keymap_mapping)
 void
 KeyboardConfig::bind_key(SDL_Keycode key, int player, Control c)
 {
+  if(!is_configurable(c)) return;
   erase_binding(key);
   // add new mapping
   m_keymap[key] = PlayerControl{player, c};
 }
+
+
+
+
+bool
+KeyboardConfig::is_configurable(SDL_Keycode key)
+{
+  auto maybe_binding = get_binding(key);
+  if(maybe_binding)
+   return is_configurable((*maybe_binding).control);
+  
+  return true;
+}
+
 
 void
 KeyboardConfig::erase_binding(SDL_Keycode key){

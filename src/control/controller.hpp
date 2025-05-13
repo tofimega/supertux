@@ -108,7 +108,7 @@ public:
 
 protected:
   /** current control status */
-  bool m_controls[static_cast<int>(Control::CONTROLCOUNT)];
+  int m_controls[static_cast<int>(Control::CONTROLCOUNT)];
 
   /** control status at last frame */
   bool m_old_controls[static_cast<int>(Control::CONTROLCOUNT)];

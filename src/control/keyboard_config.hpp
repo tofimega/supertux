@@ -55,6 +55,8 @@ public:
   void erase_binding(SDL_Keycode key);
   void clear_bindings(int player, Control c);
   inline bool is_bound(SDL_Keycode key){return m_keymap.find(key)!=m_keymap.end();};
+  inline bool is_configurable(Control c){return m_configurable_controls.find(c)!=m_configurable_controls.end();};
+  bool is_configurable(SDL_Keycode key);
   std::optional<PlayerControl> get_binding(SDL_Keycode key);
   void read(const ReaderMapping& keymap_mapping);
   void write(Writer& writer);

@@ -100,8 +100,13 @@ Controller::reset()
 void
 Controller::set_control(Control control, bool value)
 {
- 
-  m_controls[static_cast<int>(control)] = value;
+  if (value)
+    ++m_controls[static_cast<int>(control)];
+  else
+    --m_controls[static_cast<int>(control)];
+
+  if(m_controls[static_cast<int>(control)]<=0) 
+   m_controls[static_cast<int>(control)]=0;
 }
 
 void

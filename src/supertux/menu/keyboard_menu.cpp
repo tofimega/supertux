@@ -34,35 +34,32 @@ KeyboardMenu::KeyboardMenu(InputManager& input_manager, int player_id) :
 {
   add_label(_("Setup Keyboard"));
   add_hl();
-  add_entry((_("Test")),
-      [&input_manager, player_id] {
-        MenuManager::instance().push_menu(std::make_unique<KeybindConfigMenu>(input_manager, player_id, Control::UP));
-      });
+  
+  add_entry(static_cast<int>(Control::UP),         _("Up"));
+  add_entry(static_cast<int>(Control::DOWN),       _("Down"));
+  add_entry(static_cast<int>(Control::LEFT),       _("Left"));
+  add_entry(static_cast<int>(Control::RIGHT),      _("Right"));
+  add_entry(static_cast<int>(Control::JUMP),       _("Jump"));
+  add_entry(static_cast<int>(Control::ACTION),     _("Action"));
+  add_entry(static_cast<int>(Control::GRAB),       _("Grab"));
+  add_entry(static_cast<int>(Control::INTERACT),   _("Interact"));
+  add_entry(static_cast<int>(Control::ITEM),       _("Item Pocket"));
 
-  add_hl();
-  add_controlfield(static_cast<int>(Control::UP),         _("Up"));
-  add_controlfield(static_cast<int>(Control::DOWN),       _("Down"));
-  add_controlfield(static_cast<int>(Control::LEFT),       _("Left"));
-  add_controlfield(static_cast<int>(Control::RIGHT),      _("Right"));
-  add_controlfield(static_cast<int>(Control::JUMP),       _("Jump"));
-  add_controlfield(static_cast<int>(Control::ACTION),     _("Action"));
-  add_controlfield(static_cast<int>(Control::GRAB),       _("Grab"));
-  add_controlfield(static_cast<int>(Control::INTERACT),   _("Interact"));
-  add_controlfield(static_cast<int>(Control::ITEM),       _("Item Pocket"));
+  add_entry(static_cast<int>(Control::PEEK_LEFT),  _("Peek Left"));
+  add_entry(static_cast<int>(Control::PEEK_RIGHT), _("Peek Right"));
+  add_entry(static_cast<int>(Control::PEEK_UP),    _("Peek Up"));
+  add_entry(static_cast<int>(Control::PEEK_DOWN),  _("Peek Down"));
 
-  add_controlfield(static_cast<int>(Control::PEEK_LEFT),  _("Peek Left"));
-  add_controlfield(static_cast<int>(Control::PEEK_RIGHT), _("Peek Right"));
-  add_controlfield(static_cast<int>(Control::PEEK_UP),    _("Peek Up"));
-  add_controlfield(static_cast<int>(Control::PEEK_DOWN),  _("Peek Down"));
 
   if (m_player_id == 0)
   {
     if (g_config->developer_mode) {
-      add_controlfield(static_cast<int>(Control::CONSOLE), _("Console"));
-      add_controlfield(static_cast<int>(Control::CHEAT_MENU), _("Cheat Menu"));
-      add_controlfield(static_cast<int>(Control::DEBUG_MENU), _("Debug Menu"));
+      add_entry(static_cast<int>(Control::CONSOLE),    _("Console"));
+      add_entry(static_cast<int>(Control::CHEAT_MENU), _("Cheat Menu"));
+      add_entry(static_cast<int>(Control::DEBUG_MENU), _("Debug Menu"));
     }
   }
+
   add_hl();
   add_toggle(static_cast<int>(Control::CONTROLCOUNT), _("Jump with Up"), &g_config->keyboard_config.m_jump_with_up_kbd);
   add_toggle(static_cast<int>(Control::CONTROLCOUNT)+1, _("Interact with Up"), &g_config->keyboard_config.m_interact_with_up_kbd);
@@ -132,12 +129,10 @@ KeyboardMenu::menu_action(MenuItem& item)
 {
   if (item.get_id() >= 0 && item.get_id() < static_cast<int>(Control::CONTROLCOUNT))
   {
-    ItemControlField& field = static_cast<ItemControlField&>(item);
-    field.change_input(_("Press Key"));
-    m_input_manager.keyboard_manager->bind_next_event_to(m_player_id, static_cast<Control>(item.get_id()));
+    MenuManager::instance().push_menu(std::make_unique<KeybindConfigMenu>(m_input_manager, m_player_id, static_cast<Control>(item.get_id())));
   }
 }
-
+/*
 void
 KeyboardMenu::refresh()
 {
@@ -165,10 +160,11 @@ KeyboardMenu::refresh()
 void
 KeyboardMenu::refresh_control(const Control& control)
 {
-  
+  return;
   ItemControlField& field = static_cast<ItemControlField&>(get_item_by_id(static_cast<int>(control)));
   field.change_input(get_key_name(g_config->keyboard_config.reversemap_key(m_player_id, control)[0]));
 
   }
+*/
 
 /* EOF */

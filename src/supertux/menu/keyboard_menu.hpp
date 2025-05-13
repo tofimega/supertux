@@ -28,12 +28,10 @@ class KeyboardMenu final : public Menu
 public:
   KeyboardMenu(InputManager& input_manager, int player_id = 0);
 
-  void refresh() override;
+  
   std::string get_key_name(SDL_Keycode key) const;
   void menu_action(MenuItem& item) override;
 
-private:
-  void refresh_control(const Control& control);
 
 private:
   InputManager& m_input_manager;

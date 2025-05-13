@@ -36,6 +36,7 @@ KeyboardManager::KeyboardManager(InputManager* parent,
 void
 KeyboardManager::process_key_event(const SDL_KeyboardEvent& event)
 {
+  if(event.repeat) return;
   auto key_mapping = m_keyboard_config.m_keymap.find(event.keysym.sym);
 
   // if console key was pressed: toggle console
@@ -73,26 +74,27 @@ KeyboardManager::process_key_event(const SDL_KeyboardEvent& event)
   }
   else
   {
+    
     auto control = key_mapping->second;
     bool value = (event.type == SDL_KEYDOWN);
 
     if (control.player >= m_parent->get_num_users())
       return;
 
-
+    
     Controller* controller = &m_parent->get_controller(control.player);
 
 
     controller->set_control_key_flags(control.control, value);
     controller->set_control(control.control, value);
 
-    if (m_keyboard_config.m_jump_with_up_kbd) {
-      controller->set_control(Control::JUMP, controller->jump_key_pressed() | controller->up_key_pressed());
+    if (m_keyboard_config.m_jump_with_up_kbd && control.control!=Control::JUMP) {
+      controller->set_control(Control::JUMP,  controller->up_key_pressed());
       }
-    if (m_keyboard_config.m_grab_with_action_kbd) {
-      controller->set_control(Control::GRAB, controller->action_key_pressed() | controller->grab_key_pressed());
+    if (m_keyboard_config.m_grab_with_action_kbd && control.control!=Control::GRAB) {
+      controller->set_control(Control::GRAB, controller->action_key_pressed() );
       }
-    if(m_keyboard_config.m_interact_with_up_kbd){
+    if(m_keyboard_config.m_interact_with_up_kbd && control.control!=Control::INTERACT){
       controller->set_control(Control::INTERACT, controller->up_key_pressed());
       }
 
@@ -186,8 +188,10 @@ KeyboardManager::process_menu_key_event(const SDL_KeyboardEvent& event)
     if (event.keysym.sym != SDLK_ESCAPE &&
         event.keysym.sym != SDLK_PAUSE)
     {
+      if(m_keyboard_config.is_configurable(event.keysym.sym)){
       std::optional<KeyboardConfig::PlayerControl> maybe_binding = m_keyboard_config.get_binding(event.keysym.sym);
       if(maybe_binding){
+        
         KeyboardConfig::PlayerControl binding = *maybe_binding;
         Dialog::show_confirmation(fmt::format(fmt::runtime(_("This input is already mapped to {} on Player {}. would you like to overwrite it?")),
         Control_to_string(binding.control), std::to_string(binding.player + 1)), 
@@ -201,6 +205,10 @@ KeyboardManager::process_menu_key_event(const SDL_KeyboardEvent& event)
       m_keyboard_config.bind_key(event.keysym.sym, m_wait_for_key->player, m_wait_for_key->control);
        MenuManager::instance().set_dialog({});
       }
+    }
+    else{
+     Dialog::show_message(_("This key cannot be assigned"));
+    }
      
     }
     m_parent->reset();
