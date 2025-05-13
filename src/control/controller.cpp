@@ -72,9 +72,7 @@ std::optional<Control> Control_from_string(const std::string& text)
 
 Controller::Controller():
   m_touchscreen(false),
-  m_jump_key_pressed(false),
   m_up_key_pressed(false),
-  m_grab_key_pressed(false),
   m_action_key_pressed(false)
 {
   reset();
@@ -91,9 +89,7 @@ Controller::reset()
     m_old_controls[i] = false;
   }
   m_touchscreen = false;
-  m_jump_key_pressed = false;
   m_up_key_pressed = false;
-  m_grab_key_pressed = false;
   m_action_key_pressed = false;
 }
 
@@ -111,14 +107,8 @@ Controller::set_control(Control control, bool value)
 
 void
 Controller::set_control_key_flags(Control control, bool value){
-  if (control == Control::JUMP) {
-    m_jump_key_pressed = value;
-  }
   if(control == Control::UP){
     m_up_key_pressed = value;
-  }
-  else if(control == Control::GRAB){
-    m_grab_key_pressed = value;
   }
   else if(control == Control::ACTION){
     m_action_key_pressed = value;
