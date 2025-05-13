@@ -84,18 +84,16 @@ KeyboardManager::process_key_event(const SDL_KeyboardEvent& event)
     
     Controller* controller = &m_parent->get_controller(control.player);
 
-
-    controller->set_control_key_flags(control.control, value);
     controller->set_control(control.control, value);
 
-    if (m_keyboard_config.m_jump_with_up_kbd && control.control!=Control::JUMP) {
-      controller->set_control(Control::JUMP,  controller->up_key_pressed());
+    if (m_keyboard_config.m_jump_with_up_kbd && control.control==Control::UP) {
+      controller->set_control(Control::JUMP,  value);
       }
-    if (m_keyboard_config.m_grab_with_action_kbd && control.control!=Control::GRAB) {
-      controller->set_control(Control::GRAB, controller->action_key_pressed() );
+    if (m_keyboard_config.m_grab_with_action_kbd && control.control==Control::ACTION) {
+      controller->set_control(Control::GRAB, value );
       }
-    if(m_keyboard_config.m_interact_with_up_kbd && control.control!=Control::INTERACT){
-      controller->set_control(Control::INTERACT, controller->up_key_pressed());
+    if(m_keyboard_config.m_interact_with_up_kbd && control.control==Control::UP){
+      controller->set_control(Control::INTERACT, value);
       }
 
     if(control.control == Control::JUMP){

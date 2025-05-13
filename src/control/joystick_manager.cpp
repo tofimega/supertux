@@ -277,22 +277,21 @@ JoystickManager::set_joy_controls(SDL_JoystickID joystick, Control id, bool valu
 
   Controller* controller = &parent->get_controller(it->second);
 
-  controller->set_control_key_flags(id, value);
   controller->set_control(id, value);
 
-  if (m_joystick_config.m_jump_with_up_joy && id!=Control::JUMP)
+  if (m_joystick_config.m_jump_with_up_joy && id==Control::UP)
   {
-    controller->set_control(Control::JUMP,  controller->up_key_pressed());
+    controller->set_control(Control::JUMP,  value);
   }
 
-  if (m_joystick_config.m_grab_with_action_joy && id!=Control::ACTION)
+  if (m_joystick_config.m_grab_with_action_joy && id==Control::ACTION)
   {
-   controller->set_control(Control::GRAB, controller->action_key_pressed());
+   controller->set_control(Control::GRAB, value);
   }
 
-  if (m_joystick_config.m_interact_with_up_joy && id!=Control::INTERACT)
+  if (m_joystick_config.m_interact_with_up_joy && id==Control::UP)
   {
-  controller->set_control(Control::INTERACT, controller->up_key_pressed());
+  controller->set_control(Control::INTERACT, value);
   }
 
   if(id==Control::JUMP){
