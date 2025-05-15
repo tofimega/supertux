@@ -193,8 +193,8 @@ KeyboardManager::process_menu_key_event(const SDL_KeyboardEvent& event)
         KeyboardConfig::PlayerControl binding = *maybe_binding;
         Dialog::show_confirmation(fmt::format(fmt::runtime(_("This input is already mapped to {} on Player {}. would you like to overwrite it?")),
         Control_to_string(binding.control), std::to_string(binding.player + 1)), 
-        [event,this]{
-        m_keyboard_config.bind_key(event.keysym.sym, m_wait_for_key->player, m_wait_for_key->control);
+        [event,pc=m_wait_for_key, kc=m_keyboard_config]{
+        kc.bind_key(event.keysym.sym, pc->player, kc->control);
         MenuManager::instance().set_dialog({});
         MenuManager::instance().refresh();
         });

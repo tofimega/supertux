@@ -153,6 +153,7 @@ void
 KeyboardConfig::bind_key(SDL_Keycode key, int player, Control c)
 {
   if(!is_configurable(c)) return;
+  if(!is_configurable(key)) return;
   erase_binding(key);
   // add new mapping
   m_keymap[key] = PlayerControl{player, c};
@@ -174,6 +175,7 @@ KeyboardConfig::is_configurable(SDL_Keycode key)
 
 void
 KeyboardConfig::erase_binding(SDL_Keycode key){
+  if(!is_configurable(key)) return;
   auto i = m_keymap.find(key);
   if (i != m_keymap.end() && is_configurable(i->second.control))
    m_keymap.erase(i);
