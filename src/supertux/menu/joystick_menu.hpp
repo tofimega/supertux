@@ -20,6 +20,7 @@
 
 #include "control/input_manager.hpp"
 #include "gui/menu_item.hpp"
+#include <SDL.h>
 
 class JoystickMenu final : public Menu
 {
@@ -31,6 +32,8 @@ public:
   void refresh_menu_item(Control id);
 
   std::string get_button_name(int button) const;
+  std::string get_axis_name(int button) const;
+  std::string get_hat_dir_name(int button) const;
   void menu_action(MenuItem& item) override;
 
 private:
@@ -40,6 +43,7 @@ private:
   InputManager& m_input_manager;
   bool m_joysticks_available;
   bool m_auto_joystick_cfg;
+  SDL_JoystickID m_joy_id;
 
 private:
   JoystickMenu(const JoystickMenu&) = delete;

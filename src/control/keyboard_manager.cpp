@@ -193,8 +193,8 @@ KeyboardManager::process_menu_key_event(const SDL_KeyboardEvent& event)
         KeyboardConfig::PlayerControl binding = *maybe_binding;
         Dialog::show_confirmation(fmt::format(fmt::runtime(_("This input is already mapped to {} on Player {}. would you like to overwrite it?")),
         Control_to_string(binding.control), std::to_string(binding.player + 1)), 
-        [event,pc=m_wait_for_key, kc=m_keyboard_config]{
-        kc.bind_key(event.keysym.sym, pc->player, kc->control);
+        [event,pc=m_wait_for_key, &kc=m_keyboard_config]{
+        kc.bind_key(event.keysym.sym, pc->player, pc->control);
         MenuManager::instance().set_dialog({});
         MenuManager::instance().refresh();
         });
@@ -215,13 +215,13 @@ KeyboardManager::process_menu_key_event(const SDL_KeyboardEvent& event)
     return;
   }
 
-  if (m_parent->joystick_manager->wait_for_joystick >= 0)
+  if (m_parent->joystick_manager->wait_for_joystick)
   {
     if (event.keysym.sym == SDLK_ESCAPE)
     {
       m_parent->reset();
       MenuManager::instance().refresh();
-      m_parent->joystick_manager->wait_for_joystick = -1;
+      m_parent->joystick_manager->wait_for_joystick = std::nullopt;
     }
     return;
   }

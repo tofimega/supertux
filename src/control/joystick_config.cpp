@@ -34,6 +34,7 @@ JoystickConfig::JoystickConfig() :
   m_joy_hat_map()
 {
   // Default joystick button configuration
+
   bind_joybutton(0, 0, Control::JUMP);
   bind_joybutton(0, 0, Control::MENU_SELECT);
   bind_joybutton(0, 1, Control::ACTION);
@@ -51,37 +52,51 @@ JoystickConfig::JoystickConfig() :
   bind_joyaxis(0, 2, Control::DOWN);
 }
 
-int
-JoystickConfig::reversemap_joyaxis(Control c) const
+std::vector<int>
+JoystickConfig::reversemap_joyaxis(JoystickID joy_id, Control c) const
 {
+
+  std::vector<int> rt;
   for (const auto& i : m_joy_axis_map) {
-    if (i.second == c)
-      return i.first.second;
+    if (i.first.first==joy_id && i.second == c)
+      rt.push_back(i.first.second);
   }
 
-  return 0;
+  if (rt.size()==0)
+   rt.push_back(-1);
+
+  return rt;
 }
 
-int
-JoystickConfig::reversemap_joybutton(Control c) const
+std::vector<int>
+JoystickConfig::reversemap_joybutton(JoystickID joy_id, Control c) const
 {
+
+  std::vector<int> rt;
   for (const auto& i : m_joy_button_map) {
-    if (i.second == c)
-      return i.first.second;
+    if (i.first.first==joy_id && i.second == c)
+       rt.push_back(i.first.second);
   }
 
-  return -1;
+  if (rt.size()==0)
+   rt.push_back(-1);
+
+  return rt;
 }
 
-int
-JoystickConfig::reversemap_joyhat(Control c) const
+std::vector<int>
+JoystickConfig::reversemap_joyhat(JoystickID joy_id, Control c) const
 {
+   std::vector<int> rt;
   for (const auto& i : m_joy_hat_map) {
-    if (i.second == c)
-      return i.first.second;
+    if (i.first.first==joy_id && i.second == c)
+      rt.push_back(i.first.second);
   }
 
-  return -1;
+  if (rt.size()==0)
+   rt.push_back(-1);
+
+  return rt;
 }
 
 void
@@ -103,26 +118,53 @@ JoystickConfig::print_joystick_mappings() const
   std::cout << std::endl;
 }
 
+
 void
-JoystickConfig::unbind_joystick_control(Control control)
+JoystickConfig::erase_button_binding(JoystickID joy_id, int button)
+{
+  auto i = m_joy_button_map.find(std::make_pair(joy_id, button));
+  if(i!=m_joy_button_map.end())
+  m_joy_button_map.erase(i);
+}
+
+void
+JoystickConfig::erase_joyhat_binding(JoystickID joy_id, int hat)
+{
+  auto i = m_joy_hat_map.find(std::make_pair(joy_id, hat));
+  if(i!=m_joy_hat_map.end())
+  m_joy_hat_map.erase(i);
+}
+
+void
+JoystickConfig::erase_joyaxis_binding(JoystickID joy_id, int axis)
+{
+  auto i = m_joy_axis_map.find(std::make_pair(joy_id, axis));
+  if(i!=m_joy_axis_map.end())
+  m_joy_axis_map.erase(i);
+}
+
+
+
+void
+JoystickConfig::unbind_joystick_control(JoystickID joy_id, Control control)
 {
   // remove all previous mappings for that control
   for (auto i = m_joy_axis_map.begin(); i != m_joy_axis_map.end(); /* no ++i */) {
-    if (i->second == control)
+    if (i->first.first == joy_id && i->second == control)
       m_joy_axis_map.erase(i++);
     else
       ++i;
   }
 
   for (auto i = m_joy_button_map.begin(); i != m_joy_button_map.end(); /* no ++i */) {
-    if (i->second == control)
+    if (i->first.first == joy_id && i->second == control)
       m_joy_button_map.erase(i++);
     else
       ++i;
   }
 
   for (auto i = m_joy_hat_map.begin(); i != m_joy_hat_map.end(); /* no ++i */) {
-    if (i->second == control)
+    if (i->first.first == joy_id && i->second == control)
       m_joy_hat_map.erase(i++);
     else
       ++i;
@@ -137,7 +179,7 @@ JoystickConfig::bind_joyaxis(JoystickID joy_id, int axis, Control control)
   // used (negative axis 0 becomes -1, positive axis 2 becomes +3,
   // etc.)
 
-  unbind_joystick_control(control);
+  unbind_joystick_control(joy_id, control);
 
   // add new mapping
   m_joy_axis_map[std::make_pair(joy_id, axis)] = control;
@@ -146,7 +188,7 @@ JoystickConfig::bind_joyaxis(JoystickID joy_id, int axis, Control control)
 void
 JoystickConfig::bind_joyhat(JoystickID joy_id, int dir, Control c)
 {
-  unbind_joystick_control(c);
+  unbind_joystick_control(joy_id, c);
 
   // add new mapping
   m_joy_hat_map[std::make_pair(joy_id, dir)] = c;
@@ -155,7 +197,7 @@ JoystickConfig::bind_joyhat(JoystickID joy_id, int dir, Control c)
 void
 JoystickConfig::bind_joybutton(JoystickID joy_id, int button, Control control)
 {
-  unbind_joystick_control(control);
+  unbind_joystick_control(joy_id, control);
 
   // add new mapping
   m_joy_button_map[std::make_pair(joy_id, button)] = control;

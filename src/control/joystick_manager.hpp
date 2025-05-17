@@ -45,7 +45,7 @@ public:
   void process_axis_event(const SDL_JoyAxisEvent& jaxis);
   void process_button_event(const SDL_JoyButtonEvent& jbutton);
 
-  void bind_next_event_to(Control id);
+  void bind_next_event_to(SDL_JoystickID joystick, Control id);
 
   void set_joy_controls(SDL_JoystickID joystick, Control id, bool value);
 
@@ -79,7 +79,7 @@ private:
 
   Uint8 hat_state;
 
-  int wait_for_joystick;
+  std::optional<std::pair<SDL_JoystickID, Control>> wait_for_joystick;
 
   std::unordered_map<SDL_Joystick*, int> joysticks;
 

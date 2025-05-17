@@ -37,7 +37,7 @@ JoystickManager::JoystickManager(InputManager* parent_,
   max_joyaxis(),
   max_joyhats(),
   hat_state(0),
-  wait_for_joystick(-1),
+  wait_for_joystick(std::nullopt),
   joysticks()
 {
 }
@@ -142,22 +142,22 @@ JoystickManager::process_hat_event(const SDL_JoyHatEvent& jhat)
 {
   Uint8 changed = hat_state ^ jhat.value;
 
-  if (wait_for_joystick >= 0)
+  if (wait_for_joystick && (*wait_for_joystick).first==jhat.which)
   {
     if (changed & SDL_HAT_UP && jhat.value & SDL_HAT_UP)
-      m_joystick_config.bind_joyhat(jhat.which, SDL_HAT_UP, Control(wait_for_joystick));
+      m_joystick_config.bind_joyhat(jhat.which, SDL_HAT_UP, (*wait_for_joystick).second);
 
     if (changed & SDL_HAT_DOWN && jhat.value & SDL_HAT_DOWN)
-      m_joystick_config.bind_joyhat(jhat.which, SDL_HAT_DOWN, Control(wait_for_joystick));
+      m_joystick_config.bind_joyhat(jhat.which, SDL_HAT_DOWN, (*wait_for_joystick).second);
 
     if (changed & SDL_HAT_LEFT && jhat.value & SDL_HAT_LEFT)
-      m_joystick_config.bind_joyhat(jhat.which, SDL_HAT_LEFT, Control(wait_for_joystick));
+      m_joystick_config.bind_joyhat(jhat.which, SDL_HAT_LEFT, (*wait_for_joystick).second);
 
     if (changed & SDL_HAT_RIGHT && jhat.value & SDL_HAT_RIGHT)
-      m_joystick_config.bind_joyhat(jhat.which, SDL_HAT_RIGHT, Control(wait_for_joystick));
+      m_joystick_config.bind_joyhat(jhat.which, SDL_HAT_RIGHT, (*wait_for_joystick).second);
 
     MenuManager::instance().refresh();
-    wait_for_joystick = -1;
+    wait_for_joystick = std::nullopt;
   }
   else
   {
@@ -196,16 +196,16 @@ JoystickManager::process_hat_event(const SDL_JoyHatEvent& jhat)
 void
 JoystickManager::process_axis_event(const SDL_JoyAxisEvent& jaxis)
 {
-  if (wait_for_joystick >= 0)
+  if (wait_for_joystick && (*wait_for_joystick).first==jaxis.which)
   {
     if (abs(jaxis.value) > m_joystick_config.m_dead_zone) {
       if (jaxis.value < 0)
-        m_joystick_config.bind_joyaxis(jaxis.which, -(jaxis.axis + 1), Control(wait_for_joystick));
+        m_joystick_config.bind_joyaxis(jaxis.which, -(jaxis.axis + 1), (*wait_for_joystick).second);
       else
-        m_joystick_config.bind_joyaxis(jaxis.which, jaxis.axis + 1, Control(wait_for_joystick));
+        m_joystick_config.bind_joyaxis(jaxis.which, jaxis.axis + 1, (*wait_for_joystick).second);
 
       MenuManager::instance().refresh();
-      wait_for_joystick = -1;
+      wait_for_joystick = std::nullopt;
     }
   }
   else
@@ -240,14 +240,14 @@ JoystickManager::process_axis_event(const SDL_JoyAxisEvent& jaxis)
 void
 JoystickManager::process_button_event(const SDL_JoyButtonEvent& jbutton)
 {
-  if (wait_for_joystick >= 0)
+  if (wait_for_joystick && (*wait_for_joystick).first==jbutton.which)
   {
     if (jbutton.state == SDL_PRESSED)
     {
-      m_joystick_config.bind_joybutton(jbutton.which, jbutton.button, static_cast<Control>(wait_for_joystick));
+      m_joystick_config.bind_joybutton(jbutton.which, jbutton.button, (*wait_for_joystick).second);
       MenuManager::instance().refresh();
       parent->reset();
-      wait_for_joystick = -1;
+      wait_for_joystick = std::nullopt;
     }
   }
   else
@@ -262,9 +262,9 @@ JoystickManager::process_button_event(const SDL_JoyButtonEvent& jbutton)
 }
 
 void
-JoystickManager::bind_next_event_to(Control id)
+JoystickManager::bind_next_event_to(SDL_JoystickID joystick, Control id)
 {
-  wait_for_joystick = static_cast<int>(id);
+  wait_for_joystick = std::make_pair(joystick, id);
 }
 
 void

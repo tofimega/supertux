@@ -19,6 +19,7 @@
 
 #include <map>
 #include <SDL.h>
+#include <vector>
 
 #include "control/controller.hpp"
 
@@ -39,15 +40,19 @@ public:
 
   void print_joystick_mappings() const;
 
-  int reversemap_joybutton(Control c) const;
-  int reversemap_joyaxis(Control c) const;
-  int reversemap_joyhat(Control c) const;
+  std::vector<int> reversemap_joybutton(JoystickID joy_id, Control c) const;
+  std::vector<int> reversemap_joyaxis(JoystickID joy_id, Control c) const;
+  std::vector<int> reversemap_joyhat(JoystickID joy_id, Control c) const;
 
-  void unbind_joystick_control(Control c);
+  void unbind_joystick_control(JoystickID joy_id, Control c);
 
   void bind_joybutton(JoystickID joy_id, int button, Control c);
   void bind_joyaxis(JoystickID joy_id, int axis, Control c);
   void bind_joyhat(JoystickID joy_id, int dir, Control c);
+
+  void erase_button_binding(JoystickID joy_id, int button);
+  void erase_joyhat_binding(JoystickID joy_id, int hat);
+  void erase_joyaxis_binding(JoystickID joy_id, int axis);
 
   void read(const ReaderMapping& joystick_mapping);
   void write(Writer& writer);

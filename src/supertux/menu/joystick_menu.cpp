@@ -17,14 +17,15 @@
 
 #include "supertux/menu/joystick_menu.hpp"
 
+#include <iostream>
 #include <sstream>
-
 #include "control/joystick_manager.hpp"
 #include "gui/item_controlfield.hpp"
 #include "gui/item_toggle.hpp"
 #include "supertux/gameconfig.hpp"
 #include "supertux/globals.hpp"
 #include "util/gettext.hpp"
+#include "control/game_controller_manager.hpp"
 
 namespace {
 
@@ -39,7 +40,8 @@ enum {
 JoystickMenu::JoystickMenu(InputManager& input_manager) :
   m_input_manager(input_manager),
   m_joysticks_available(false),
-  m_auto_joystick_cfg(!m_input_manager.use_game_controller())
+  m_auto_joystick_cfg(!m_input_manager.use_game_controller()),
+  m_joy_id(0)
 {
   recreate_menu();
 }
@@ -68,6 +70,10 @@ JoystickMenu::recreate_menu()
     {
       m_joysticks_available = true;
 
+      add_hl();
+      add_label(_("Test"));
+      add_hl();
+
       add_controlfield(static_cast<int>(Control::UP),          _("Up"));
       add_controlfield(static_cast<int>(Control::DOWN),        _("Down"));
       add_controlfield(static_cast<int>(Control::LEFT),        _("Left"));
@@ -87,9 +93,46 @@ JoystickMenu::recreate_menu()
         add_controlfield(static_cast<int>(Control::CHEAT_MENU), _("Cheat Menu"));
         add_controlfield(static_cast<int>(Control::DEBUG_MENU), _("Debug Menu"));
       }
+      add_hl();
       add_toggle(MNID_JUMP_WITH_UP, _("Jump with Up"), &g_config->joystick_config.m_jump_with_up_joy);
       add_toggle(MNID_JUMP_WITH_UP+1, _("Interact with Up"), &g_config->joystick_config.m_interact_with_up_joy);
       add_toggle(MNID_JUMP_WITH_UP+1, _("Grab with Action"), &g_config->joystick_config.m_grab_with_action_joy);
+
+      if(InputManager::current()->m_use_game_controller){
+        auto cont_map=m_input_manager.game_controller_manager->get_controller_mapping();
+        if(cont_map.size()>1){
+        add_hl() ;
+        for(auto c: cont_map){
+          SDL_GameController* cont=c.first;
+          SDL_JoystickID i = SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(cont));
+          if(i==m_joy_id) continue;
+          add_entry(_(SDL_GameControllerName(cont)),
+            [this, i]{
+              m_joy_id=i;
+              recreate_menu();
+            });
+        }
+      }
+      }
+      else{
+      auto joy_map=m_input_manager.joystick_manager->get_joystick_mapping();
+        if(joy_map.size()>1){
+        add_hl() ;
+        for(auto c: joy_map){
+          SDL_Joystick* cont=c.first;
+          SDL_JoystickID i=SDL_JoystickInstanceID(cont);
+          if(i==m_joy_id) continue;
+          add_entry(_(SDL_JoystickName(cont)),
+            [this, i]{
+              m_joy_id=i;
+              recreate_menu();
+            });
+        }
+      }
+
+
+
+    }
     }
     else
     {
@@ -123,11 +166,12 @@ JoystickMenu::get_button_name(int button) const
 void
 JoystickMenu::menu_action(MenuItem& item)
 {
+  return;
   if (0 <= item.get_id() && item.get_id() < static_cast<int>(Control::CONTROLCOUNT))
   {
     ItemControlField& field = static_cast<ItemControlField&>(item);
     field.change_input(_("Press Button"));
-    m_input_manager.joystick_manager->bind_next_event_to(static_cast<Control>(item.get_id()));
+    m_input_manager.joystick_manager->bind_next_event_to(m_joy_id , static_cast<Control>(item.get_id()));
   }
   else if (item.get_id() == MNID_AUTO_JOYSTICK_CFG)
   {
@@ -151,9 +195,9 @@ JoystickMenu::refresh_menu_item(Control id)
     return;
   }
 
-  int button  = g_config->joystick_config.reversemap_joybutton(id);
-  int axis    = g_config->joystick_config.reversemap_joyaxis(id);
-  int hat_dir = g_config->joystick_config.reversemap_joyhat(id);
+  int button  = g_config->joystick_config.reversemap_joybutton(m_joy_id,id)[0];
+  int axis    = g_config->joystick_config.reversemap_joyaxis(m_joy_id,id)[0];
+  int hat_dir = g_config->joystick_config.reversemap_joyhat(m_joy_id,id)[0];
 
   if (button != -1)
   {
@@ -161,31 +205,26 @@ JoystickMenu::refresh_menu_item(Control id)
   }
   else if (axis != 0)
   {
-    std::ostringstream name;
+    
 
-    name << _("Axis ");
-
-    if (axis < 0)
-      name << _("-");
-    else
-      name << _("+");
-
-    if (abs(axis) == 1)
-      name << _("X");
-    else if (abs(axis) == 2)
-      name << _("Y");
-    else if (abs(axis) == 3)
-      name << _("X2");
-    else if (abs(axis) == 4)
-      name << _("Y2");
-    else
-      name << abs(axis);
-
-    itemcf->change_input(name.str());
+    itemcf->change_input(get_axis_name(axis));
   }
   else if (hat_dir != -1)
   {
-    std::string name;
+    
+
+    itemcf->change_input(get_hat_dir_name(hat_dir));
+  }
+  else
+  {
+    itemcf->change_input(_("None"));
+  }
+}
+
+std::string
+JoystickMenu::get_hat_dir_name(int hat_dir) const
+{
+std::string name;
 
     switch (hat_dir)
     {
@@ -210,13 +249,37 @@ JoystickMenu::refresh_menu_item(Control id)
         break;
     }
 
-    itemcf->change_input(name);
-  }
-  else
-  {
-    itemcf->change_input(_("None"));
-  }
+    return name;
 }
+
+
+std::string
+JoystickMenu::get_axis_name(int axis) const
+{
+  std::ostringstream name;
+
+    name << _("Axis ");
+
+    if (axis < 0)
+      name << _("-");
+    else
+      name << _("+");
+
+    if (abs(axis) == 1)
+      name << _("X");
+    else if (abs(axis) == 2)
+      name << _("Y");
+    else if (abs(axis) == 3)
+      name << _("X2");
+    else if (abs(axis) == 4)
+      name << _("Y2");
+    else
+      name << abs(axis);
+
+
+    return name.str();
+}
+
 
 void
 JoystickMenu::refresh()
