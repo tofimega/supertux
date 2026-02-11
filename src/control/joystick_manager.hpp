@@ -52,6 +52,10 @@ public:
   void on_joystick_added(int joystick_index);
   void on_joystick_removed(int instance_id);
 
+  void try_bind_joyhat(SDL_JoystickID joystick_id, int jhat, Control to);
+  void try_bind_joyaxis(SDL_JoystickID joystick_id, int jaxis, Control to);
+  void try_bind_joybutton(SDL_JoystickID joystick_id, int jbutton, Control to);
+
   inline int get_num_joysticks() const { return static_cast<int>(joysticks.size()); }
 
   void on_player_removed(int player_id);

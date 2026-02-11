@@ -35,7 +35,7 @@ void JoybindConfigMenu::refresh(){
         [j=m_joystick_id,c=m_configured_action,k]{
           if(g_config->joystick_config.reversemap_joybutton(j,c).size()>1){  
           Dialog::show_confirmation(_("Delete this binding?"),[j,k]{
-          g_config->joystick_config.erase_button_binding(j,k);
+          g_config->joystick_config.erase_joybutton_binding(j,k);
           MenuManager::instance().refresh();
         });
       }
@@ -74,7 +74,7 @@ void JoybindConfigMenu::refresh(){
     add_hl();
     add_entry(_("Add new binding"),
       [j=m_joystick_id, c=m_configured_action, &i=m_input_manager] {
-        Dialog::show_message("Press any key");
+        Dialog::show_message("Press any button");
        i.joystick_manager->bind_next_event_to(j, static_cast<Control>(c));
       });
 add_entry(_("Clear bindings"),

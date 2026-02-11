@@ -46,11 +46,15 @@ public:
 
   void unbind_joystick_control(JoystickID joy_id, Control c);
 
+  std::optional<Control> get_joybutton_binding(JoystickID joy_id, int button);
+  std::optional<Control> get_joyaxis_binding(JoystickID joy_id, int axis);
+  std::optional<Control> get_joyhat_binding(JoystickID joy_id, int hat);
+
   void bind_joybutton(JoystickID joy_id, int button, Control c);
   void bind_joyaxis(JoystickID joy_id, int axis, Control c);
   void bind_joyhat(JoystickID joy_id, int dir, Control c);
 
-  void erase_button_binding(JoystickID joy_id, int button);
+  void erase_joybutton_binding(JoystickID joy_id, int button);
   void erase_joyhat_binding(JoystickID joy_id, int hat);
   void erase_joyaxis_binding(JoystickID joy_id, int axis);
 

@@ -26,6 +26,7 @@
 #include "supertux/globals.hpp"
 #include "util/gettext.hpp"
 #include "control/game_controller_manager.hpp"
+#include "supertux/menu/joybind_config_menu.hpp"
 
 namespace {
 
@@ -71,6 +72,7 @@ JoystickMenu::recreate_menu()
       m_joysticks_available = true;
 
       add_hl();
+      add_entry(_("Test"), [&i=m_input_manager, j=m_joy_id]{MenuManager::instance().push_menu(std::make_unique<JoybindConfigMenu>(i, j, Control::UP));});
       add_label(_("Test"));
       add_hl();
 
@@ -98,25 +100,10 @@ JoystickMenu::recreate_menu()
       add_toggle(MNID_JUMP_WITH_UP+1, _("Interact with Up"), &g_config->joystick_config.m_interact_with_up_joy);
       add_toggle(MNID_JUMP_WITH_UP+1, _("Grab with Action"), &g_config->joystick_config.m_grab_with_action_joy);
 
-      if(InputManager::current()->m_use_game_controller){
-        auto cont_map=m_input_manager.game_controller_manager->get_controller_mapping();
-        if(cont_map.size()>1){
-        add_hl() ;
-        for(auto c: cont_map){
-          SDL_GameController* cont=c.first;
-          SDL_JoystickID i = SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(cont));
-          if(i==m_joy_id) continue;
-          add_entry(_(SDL_GameControllerName(cont)),
-            [this, i]{
-              m_joy_id=i;
-              recreate_menu();
-            });
-        }
-      }
-      }
-      else{
+      
+      
       auto joy_map=m_input_manager.joystick_manager->get_joystick_mapping();
-        if(joy_map.size()>1){
+      if(joy_map.size()>1){
         add_hl() ;
         for(auto c: joy_map){
           SDL_Joystick* cont=c.first;
@@ -130,9 +117,6 @@ JoystickMenu::recreate_menu()
         }
       }
 
-
-
-    }
     }
     else
     {
@@ -166,7 +150,6 @@ JoystickMenu::get_button_name(int button) const
 void
 JoystickMenu::menu_action(MenuItem& item)
 {
-  return;
   if (0 <= item.get_id() && item.get_id() < static_cast<int>(Control::CONTROLCOUNT))
   {
     ItemControlField& field = static_cast<ItemControlField&>(item);
@@ -256,6 +239,8 @@ std::string name;
 std::string
 JoystickMenu::get_axis_name(int axis) const
 {
+
+
   std::ostringstream name;
 
     name << _("Axis ");

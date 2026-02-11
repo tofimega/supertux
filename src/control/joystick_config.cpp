@@ -63,7 +63,7 @@ JoystickConfig::reversemap_joyaxis(JoystickID joy_id, Control c) const
   }
 
   if (rt.size()==0)
-   rt.push_back(-1);
+   rt.push_back(0);
 
   return rt;
 }
@@ -120,7 +120,7 @@ JoystickConfig::print_joystick_mappings() const
 
 
 void
-JoystickConfig::erase_button_binding(JoystickID joy_id, int button)
+JoystickConfig::erase_joybutton_binding(JoystickID joy_id, int button)
 {
   auto i = m_joy_button_map.find(std::make_pair(joy_id, button));
   if(i!=m_joy_button_map.end())

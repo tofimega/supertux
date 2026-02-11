@@ -22,6 +22,7 @@
 #include "gui/menu_item.hpp"
 #include <SDL.h>
 
+
 class JoystickMenu final : public Menu
 {
 public:

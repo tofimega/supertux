@@ -21,6 +21,7 @@
 #include "control/input_manager.hpp"
 #include "control/joystick_config.hpp"
 #include "gui/menu_manager.hpp"
+#include "gui/dialog.hpp"
 #include "object/player.hpp"
 #include "supertux/gameconfig.hpp"
 #include "supertux/globals.hpp"
@@ -49,6 +50,27 @@ JoystickManager::~JoystickManager()
     SDL_JoystickClose(joy.first);
   }
 }
+
+void JoystickManager::try_bind_joybutton(SDL_JoystickID joy_id, int jbutton, Control to)
+{
+  std::optional<Control> maybe_binding = m_joystick_config.get_joybutton_binding(joy_id, jbutton);
+      if(maybe_binding){
+        
+        Control binding = *maybe_binding;
+        Dialog::show_confirmation(fmt::format(fmt::runtime(_("This input is already mapped to {}. would you like to overwrite it?")),
+        Control_to_string(binding)), 
+        [input, to, &jc=m_joystick_config]{
+        jc.bind_joybutton(joy_id, jbutton, to);
+        MenuManager::instance().set_dialog({});
+        MenuManager::instance().refresh();
+        });
+      }
+      else{
+      m_joystick_config.bind_joybutton(joy_id, input.button, to);
+       MenuManager::instance().set_dialog({});
+      }
+}
+
 
 void
 JoystickManager::on_joystick_added(int joystick_index)
@@ -142,6 +164,7 @@ JoystickManager::process_hat_event(const SDL_JoyHatEvent& jhat)
 {
   Uint8 changed = hat_state ^ jhat.value;
 
+
   if (wait_for_joystick && (*wait_for_joystick).first==jhat.which)
   {
     if (changed & SDL_HAT_UP && jhat.value & SDL_HAT_UP)
@@ -156,6 +179,7 @@ JoystickManager::process_hat_event(const SDL_JoyHatEvent& jhat)
     if (changed & SDL_HAT_RIGHT && jhat.value & SDL_HAT_RIGHT)
       m_joystick_config.bind_joyhat(jhat.which, SDL_HAT_RIGHT, (*wait_for_joystick).second);
 
+    MenuManager::instance().set_dialog({});
     MenuManager::instance().refresh();
     wait_for_joystick = std::nullopt;
   }
@@ -204,6 +228,7 @@ JoystickManager::process_axis_event(const SDL_JoyAxisEvent& jaxis)
       else
         m_joystick_config.bind_joyaxis(jaxis.which, jaxis.axis + 1, (*wait_for_joystick).second);
 
+      MenuManager::instance().set_dialog({});
       MenuManager::instance().refresh();
       wait_for_joystick = std::nullopt;
     }
@@ -244,8 +269,7 @@ JoystickManager::process_button_event(const SDL_JoyButtonEvent& jbutton)
   {
     if (jbutton.state == SDL_PRESSED)
     {
-      m_joystick_config.bind_joybutton(jbutton.which, jbutton.button, (*wait_for_joystick).second);
-      MenuManager::instance().refresh();
+     try_bind_joybutton(jbutton.which, jbutton.button, (*wait_for_joystick).second)
       parent->reset();
       wait_for_joystick = std::nullopt;
     }

@@ -47,6 +47,7 @@ const char* g_control_names[] = {
   nullptr
 };
 
+
 } // namespace
 
 std::ostream& operator<<(std::ostream& os, Control control)
